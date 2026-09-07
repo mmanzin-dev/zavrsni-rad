@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.zavrsni"
+    namespace = "hr.app.zavrsni"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.zavrsni"
+        applicationId = "hr.app.zavrsni"
         minSdk = 28
         targetSdk = 37
         versionCode = 1
@@ -38,7 +38,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.preference.ktx)
     implementation(libs.material)
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
