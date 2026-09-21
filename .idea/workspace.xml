@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6c9df717-c7a4-46da-b472-79fae0a61680" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/zavrsni/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zavrsni/build.gradle.kts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zavrsni/gradle.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zavrsni/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zavrsni/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zavrsni/gradlew" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zavrsni/gradlew.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zavrsni/settings.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zavrsni/app/src/main/res/navigation/nav_graph.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zavrsni/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/zavrsni/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zavrsni/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/zavrsni/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zavrsni/app/src/main/res/layout/activity_events.xml" beforeDir="false" afterPath="$PROJECT_DIR$/zavrsni/app/src/main/res/layout/activity_events.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zavrsni/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/zavrsni/gradle/libs.versions.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mapFragment">
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="hr.app.zavrsni.MapFragment"
+        android:label="Karta">
+        <action
+            android:id="@+id/action_map_to_events"
+            app:destination="@id/eventsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/eventsFragment"
+        android:name="hr.app.zavrsni.EventsFragment"
+        android:label="Događanja">
+        <argument
+            android:name="cityId"
+            app:argType="string" />
+        <argument
+            android:name="cityName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/allEventsFragment"
+        android:name="hr.app.zavrsni.AllEventsFragment"
+        android:label="Sva događanja">
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="hr.app.zavrsni.SettingsFragment"
+        android:label="Postavke">
+    </fragment>
+
+</navigation>

@@ -1,32 +1,39 @@
 package hr.app.zavrsni
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import android.content.Intent
+import android.view.LayoutInflater
 import androidx.preference.PreferenceManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 
-class MapActivity : AppCompatActivity() {
-
+class MapFragment : Fragment() {
     private lateinit var mapView: MapView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_map, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         Configuration.getInstance().load(
-            applicationContext,
-            PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        )
+            requireContext(),
+            PreferenceManager.getDefaultSharedPreferences(requireContext()))
         Configuration.getInstance().userAgentValue = "hr.app.zavrsni"
         Configuration.getInstance().userAgentHttpHeader = "User-Agent"
 
-        setContentView(R.layout.activity_map)
-
-        mapView = findViewById(R.id.mapView)
+        mapView = view.findViewById(R.id.mapView)
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
 
@@ -54,23 +61,20 @@ class MapActivity : AppCompatActivity() {
             val marker = Marker(mapView)
             marker.position = GeoPoint(city.latitude, city.longitude)
             marker.title = city.name
+            marker.icon = ContextCompat.getDrawable(requireContext(), R.drawable.location_on_48px)
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
 
             marker.setOnMarkerClickListener { _, _ ->
-                openEventsScreen(city.id, city.name)
+                val bundle = Bundle().apply {
+                    putString("cityId", city.id)
+                    putString("cityName", city.name)
+                }
+                findNavController().navigate(R.id.action_map_to_events, bundle)
                 true
             }
-
             mapView.overlays.add(marker)
         }
         mapView.invalidate()
-    }
-
-    private fun openEventsScreen(cityId: String, cityName: String) {
-        val intent = Intent(this, EventsActivity::class.java)
-        intent.putExtra("cityId", cityId)
-        intent.putExtra("cityName", cityName)
-        startActivity(intent)
     }
 
     override fun onResume() {
