@@ -1,9 +1,11 @@
 from playwright.sync_api import sync_playwright
 import json
+import re
 
 CITIES = {
     "zagreb": {
-        "url": "https://www.infozagreb.hr/en/events",
+        "url": "https://www.infozagreb.hr/hr/dogadanja",
+        "base_url": "https://www.infozagreb.hr",
         "card_selector": ".event-card",
         "title_selector": ".title",
         "date_selector": ".dates",
@@ -12,6 +14,7 @@ CITIES = {
     },
     "varazdin": {
         "url": "https://varazdin.events/",
+        "base_url": None,
         "card_selector": ".bg-white.rounded-xl.overflow-hidden.flex.flex-col",
         "title_selector": "h3.font-bold.leading-snug",
         "date_selector": ".shrink-0.text-center.relative.z-10",
@@ -20,14 +23,16 @@ CITIES = {
     },
     "bjelovar": {
         "url": "https://www.bjelovar.hr/dogadjaji/",
+        "base_url": None,
         "card_selector": "article.post.lsvr_event",
-        "title_selector": "h2.post__title",
+        "title_selector": "h3.post__title, h2.post__title",
         "date_selector": "p.post-info__date",
         "location_selector": "span.post-info__location",
-        "link_selector": "a.post__location-link",
+        "link_selector": "a.post__title-link",
     },
     "osijek": {
         "url": "https://osijek.in/dogadaji/kategorija/sva-dogadanja/popis/",
+        "base_url": None,
         "card_selector": "li.tribe-events-calendar-list__event-row",
         "title_selector": "a.tribe-events-calendar-list__event-title-link",
         "date_selector": "time.tribe-events-calendar-list__event-datetime",
@@ -36,6 +41,7 @@ CITIES = {
     },
     "pula": {
         "url": "https://pulainfo.hr/hr/pula-events/",
+        "base_url": None,
         "card_selector": ".col-sm-6.col-lg-4.col-xl-3.col-reset",
         "title_selector": ".color-caption h2",
         "date_selector": ".color-caption p[style='margin-bottom:0; float:left;']",
@@ -44,6 +50,7 @@ CITIES = {
     },
     "rijeka": {
         "url": "https://visitrijeka.hr/dogadanja",
+        "base_url": "https://visitrijeka.hr",
         "card_selector": ".view-grid-item",
         "title_selector": "h3.nc-font-sssb.text-center",
         "date_selector": "p.nc-font-sssb.type.mb-3.pt-3.text-center",
@@ -52,6 +59,7 @@ CITIES = {
     },
     "zadar": {
         "url": "https://zadar.travel/hr/dogadaji/",
+        "base_url": None,
         "card_selector": "article.a-item",
         "title_selector": "a.a-item__title, h2.a-item__title, h3.a-item__title",
         "date_selector": ".a-item__details__item:has(.icon-calendar) p",
@@ -60,6 +68,7 @@ CITIES = {
     },
     "split": {
         "url": "https://split.hr/kalendar/en/city-split-calendar",
+        "base_url": None,
         "card_selector": "article.l-item",
         "title_selector": "p.o-title",
         "date_selector": ".o-hour",
@@ -68,6 +77,7 @@ CITIES = {
     },
     "dubrovnik": {
         "url": "https://experiencedubrovnik.com/en/event-calendar?filter=thisweek",
+        "base_url": None,
         "card_selector": ".tzdevents-event-card",
         "title_selector": "h3.tzdevents-card-title",
         "date_selector": ".tzdevents-card-date-box",
@@ -76,7 +86,7 @@ CITIES = {
     }
 }
 
-def scrape_events(page, page_url, card_sel, title_sel, date_sel, location_sel, link_sel):
+def scrape_events(page, page_url, card_sel, title_sel, date_sel, location_sel, link_sel, base_url=None):
     page.goto(page_url, wait_until="domcontentloaded", timeout=60000)
 
     try:
@@ -94,19 +104,43 @@ def scrape_events(page, page_url, card_sel, title_sel, date_sel, location_sel, l
 
     cards = page.query_selector_all(card_sel)
     events = []
+    LABEL_PREFIX = ["datum", "lokacija"]
     for card in cards:
         card_title = card.query_selector(title_sel)
         card_date = card.query_selector(date_sel)
         card_location = card.query_selector(location_sel) if location_sel else None
         card_link = card.query_selector(link_sel)
+        href = card_link.get_attribute("href") if card_link else None
+        if href and base_url and not href.startswith("http"):
+            href = base_url + href
+
+        raw_title =  card_title.inner_text() if card_title else None
+        raw_date = card_date.inner_text() if card_date else None
+        raw_location = card_location.inner_text() if card_location else None
 
         events.append({
-            "title": card_title.inner_text().strip() if card_title else None,
-            "date": card_date.inner_text().strip() if card_date else None,
-            "location": card_location.inner_text().strip() if card_location else None,
-            "sourceUrl": card_link.get_attribute("href") if card_link else None,
+            "title": clean_data(raw_title, LABEL_PREFIX),
+            "date": clean_data(raw_date, LABEL_PREFIX),
+            "location": clean_data(raw_location, LABEL_PREFIX),
+            "sourceUrl": href,
         })
     return events
+
+def clean_data(raw, strip_prefix=None):
+    if raw is None:
+        return None
+
+    text = " ".join(raw.split())
+
+    if not text: 
+        return None
+
+    if strip_prefix: 
+        for prefix in strip_prefix:
+            pattern = rf"^{re.escape(prefix)}\s+"
+            text = re.sub(pattern, "", text, flags=re.IGNORECASE)
+
+    return text.strip() or None
 
 def scrape():
     results = {}
@@ -120,6 +154,7 @@ def scrape():
                 results[city] = scrape_events(
                     page,
                     page_url = config["url"],
+                    base_url = config["base_url"],
                     card_sel = config["card_selector"],
                     title_sel = config["title_selector"],
                     date_sel = config["date_selector"],
