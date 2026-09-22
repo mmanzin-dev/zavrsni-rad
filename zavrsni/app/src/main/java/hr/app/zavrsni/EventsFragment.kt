@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
@@ -32,6 +34,12 @@ class EventsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, systemBars.top, 0, 0)
+            insets
+        }
+
         cityId = arguments?.getString("cityId") ?: ""
         val cityName = arguments?.getString("cityName") ?: ""
         requireActivity().title = "Događanja u $cityName"
@@ -41,7 +49,7 @@ class EventsFragment : Fragment() {
             CustomTabsIntent.Builder().build().launchUrl(requireContext(), url.toUri())
         }
 
-        recyclerView  = view.findViewById<RecyclerView>(R.id.eventsRecyclerView)
+        recyclerView  = view.findViewById(R.id.eventsRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
